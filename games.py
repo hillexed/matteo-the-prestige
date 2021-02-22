@@ -34,7 +34,8 @@ class player(object):
     def __init__(self, json_string):
         self.stlats = json.loads(json_string)
         self.id = self.stlats["id"]
-        self.name = self.stlats["name"]
+        self.name = self.stlats["name"] # can be changed during a game
+        self.original_name = self.stlats["name"] #doesn't change, used for statkeeping
         self.game_stats = {
                             "outs_pitched" : 0,
                             "walks_allowed" : 0,
@@ -88,6 +89,16 @@ class team(object):
                 return (self.rotation[index], index, self.rotation)
         else:
             return (None, None, None)
+
+    def get_emoji(self):
+        # return the first character in a slogan, or "" if they don't have one
+        not_emoji_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.:\"'“"
+        if len(self.slogan.strip()) == 0:
+            return ""
+        possible_emoji = self.slogan.strip()[0]
+        if possible_emoji.upper() in not_emoji_chars:
+            return ""
+        return possible_emoji
 
     def find_player_spec(self, name, roster):
          for s_index in range(0,len(roster)):
@@ -669,11 +680,11 @@ class game(object):
     def get_stats(self):
         players = []
         for this_player in self.teams["away"].lineup:
-            players.append((this_player.name, this_player.game_stats))
+            players.append((this_player.original_name, this_player.game_stats))
         for this_player in self.teams["home"].lineup:
-            players.append((this_player.name, this_player.game_stats))
-        players.append((self.teams["home"].pitcher.name, self.teams["home"].pitcher.game_stats))
-        players.append((self.teams["away"].pitcher.name, self.teams["away"].pitcher.game_stats))
+            players.append((this_player.original_name, this_player.game_stats))
+        players.append((self.teams["home"].pitcher.original_name, self.teams["home"].pitcher.game_stats))
+        players.append((self.teams["away"].pitcher.original_name, self.teams["away"].pitcher.game_stats))
         return players
 
     def get_team_specific_stats(self):
@@ -682,11 +693,11 @@ class game(object):
             self.teams["home"].name : []
             }
         for this_player in self.teams["away"].lineup:
-            players[self.teams["away"].name].append((this_player.name, this_player.game_stats))
+            players[self.teams["away"].name].append((this_player.original_name, this_player.game_stats))
         for this_player in self.teams["home"].lineup:
-            players[self.teams["home"].name].append((this_player.name, this_player.game_stats))
-        players[self.teams["home"].name].append((self.teams["home"].pitcher.name, self.teams["home"].pitcher.game_stats))
-        players[self.teams["away"].name].append((self.teams["away"].pitcher.name, self.teams["away"].pitcher.game_stats))
+            players[self.teams["home"].name].append((this_player.original_name, this_player.game_stats))
+        players[self.teams["home"].name].append((self.teams["home"].pitcher.original_name, self.teams["home"].pitcher.game_stats))
+        players[self.teams["away"].name].append((self.teams["away"].pitcher.original_name, self.teams["away"].pitcher.game_stats))
         return players
         
 

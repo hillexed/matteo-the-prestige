@@ -115,6 +115,12 @@
     font-size: 25px
 }
 
+.team_emoji{
+    display: inline-block;
+    min-width: 20px;
+    width: 20px;
+}
+
 .score {
     background: var(--background-secondary);
     width: 40px;
@@ -164,7 +170,7 @@
     justify-content: flex-start;
 }
 
-.update_emoji {
+.update_emoji, .team_emoji {
     margin-right: 0.75rem;
     margin-left: 2px;
 }

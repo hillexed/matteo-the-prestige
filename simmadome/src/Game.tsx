@@ -26,8 +26,8 @@ function Game(props: {gameId: string, state : GameState}) {
 			</div>
 			<div className="body">
 			    <div className="teams">
-			        <Team name={state.away_name} score={state.away_score}/>
-			        <Team name={state.home_name} score={state.home_score}/>
+			        <Team emoji={state.away_emoji} name={state.away_name} score={state.away_score}/>
+			        <Team emoji={state.home_emoji} name={state.home_name} score={state.home_score}/>
 			    </div>
 			    <div className="info">
 			        <div className="field">
@@ -63,10 +63,13 @@ function Game(props: {gameId: string, state : GameState}) {
 	);
 }
 
-function Team(props: {name: string, score: number}) {
+function Team(props: {emoji?: string, name: string, score: number}) {
 	return (
 		<div className="team">
-        	<div className="team_name">{ props.name }</div>
+        	<div className="team_name">
+            	<div className="team_emoji">{ props.emoji }</div>
+                { props.name }
+            </div>
         	<div className="score">{ props.score }</div>
     	</div>
     );

@@ -12,8 +12,10 @@ interface GameState {
   weather_text: string
   away_name: string
   away_score: number
+  away_emoji?: string
   home_name: string
   home_score: number
+  home_emoji?: string
   pitcher: string
   batter: string
   update_emoji: string

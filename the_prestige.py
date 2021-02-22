@@ -1511,7 +1511,7 @@ async def watch_game(channel, newgame, user = None, league = None):
     if league is not None:
         ext += "&league=" + urllib.parse.quote_plus(league)
 
-    await channel.send(f"{newgame.teams['away'].name} vs. {newgame.teams['home'].name}, starting at {config()['simmadome_url']+ext}")
+    await channel.send(f"{newgame.teams['away'].get_emoji()} {newgame.teams['away'].name} vs. {newgame.teams['home'].get_emoji()}{newgame.teams['home'].name}, starting at {config()['simmadome_url']+ext}")
     gamesarray.append((newgame, channel, user, id))
 
     main_controller.master_games_dic[id] = (newgame, state_init, discrim_string)
@@ -1523,7 +1523,9 @@ def prepare_game(newgame, league = None, weather_name = None):
 
     state_init = {
         "away_name" : newgame.teams['away'].name,
+        "away_emoji" : newgame.teams['away'].get_emoji(),
         "home_name" : newgame.teams['home'].name,
+        "home_emoji" : newgame.teams['home'].get_emoji(),
         "max_innings" : newgame.max_innings,
         "update_pause" : 0,
         "top_of_inning" : True,
@@ -1961,14 +1963,15 @@ def game_over_embed(game):
     else:
         title_string += ".\n"
 
-    winning_team = game.teams['home'].name if game.teams['home'].score > game.teams['away'].score else game.teams['away'].name
+    winning_team = game.teams['home'] if game.teams['home'].score > game.teams['away'].score else game.teams['away'].name
+    winning_team_string = f"{(winning_team.get_emoji() + ' ') if winning_team.get_emoji() else ''}{winning_team.name}"
     winstring = f"{game.teams['away'].score} to {game.teams['home'].score}\n"
-    if game.victory_lap and winning_team == game.teams['home'].name:
-        winstring += f"{winning_team} wins with a victory lap!"
-    elif winning_team == game.teams['home'].name:
-        winstring += f"{winning_team} wins, shaming {game.teams['away'].name}!"
+    if game.victory_lap and winning_team.name == game.teams['home'].name:
+        winstring += f"{winning_team_string} wins with a victory lap!"
+    elif winning_team.name == game.teams['home'].name:
+        winstring += f"{winning_team_string} wins, shaming {game.teams['away'].name}!"
     else:
-        winstring += f"{winning_team} wins!"
+        winstring += f"{winning_team_string} wins!"
 
     embed = discord.Embed(color=discord.Color.dark_purple(), title=title_string)
     embed.add_field(name="Final score:", value=winstring, inline=False)
