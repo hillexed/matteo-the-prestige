@@ -280,6 +280,64 @@ class Breezy(Weather):
                 "weather_message": True
             })
 
+class BigFans(Weather):
+    def __init__(self,game):
+        self.name = "Big Fans"
+        self.emoji = "🌬️"
+        self.choose_sponsor(game)
+
+        self.made_initial_announcement = False
+
+    bonusPleasings = {
+                    appearance_outcomes.single: "S",
+                    appearance_outcomes.double: "D",
+                    appearance_outcomes.triple: "T",
+                    appearance_outcomes.homerun: "D",
+                    appearance_outcomes.grandslam: "G"}
+
+    def choose_sponsor(self, game):
+        # choose a sponsor to ensure at least one batter in this game will please the sponsor
+        all_first_characters = [player.name[0] for player in game.teams["home"].lineup] + [player.name[0] for player in game.teams["away"].lineup]
+        self.sponsor = random.choice(all_first_characters).upper()
+
+        sponsor_type = "character"
+        if self.sponsor in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+            sponsor_type = "letter"
+        if self.sponsor.isnumeric():
+            sponsor_type = "number"
+        
+        superlative = random.choice(("","","","","","","illustrious","radiant","gross","humble","tricky","world-famous","honestly slightly scared", "dishonest", "manipulative", "popular", "famous", "",""))
+        if superlative != "":
+          superlative += " "
+        self.sponsor_title = "the {}{} {}".format(superlative,sponsor_type, self.sponsor)
+
+    def activate(self, game, result):
+        if not self.made_initial_announcement:
+            self.made_initial_announcement = True
+            result.clear()
+            result.update({
+                "text": f"This game was brought to you by viewers like you and {self.sponsor_title}.",
+                "text_only": True,
+                "weather_message": True,
+            })
+            return
+
+        if result["ishit"]:
+            battername = result["batter"].name #player whose name starts with S pleases letter S
+            pleased_from_action = result["text"] in self.bonusPleasings and self.sponsor == self.bonusPleasings[result["text"]] # letter D is pleased by doubles, S for singles, T for triples...
+            
+
+            if battername.upper().startswith(self.sponsor) or pleased_from_action: 
+                result["sponsorhappy"] = True
+
+    def modify_atbat_message(self, game, state):
+        if "sponsorhappy" in game.last_update[0].keys():
+            state["update_emoji"] = self.emoji    
+            state["update_text"] += f" This pleases {self.sponsor_title}!"
+
+    def modify_top_of_inning_message(self, game, state):
+        if game.inning > 1 and random.random() < 0.2:
+            state["update_text"] += f' This game was brought to you by {self.sponsor_title}.'
 
 class Feedback(Weather):
     def __init__(self, game):
@@ -336,6 +394,7 @@ def all_weathers():
 #        "Sun 2": Sun2,
             "Feedback": Feedback,
             "Breezy": Breezy,
+            "Big Fans":BigFans,
         }
     return weathers_dic
 
