@@ -19,6 +19,7 @@ def serve(path):
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
+
 ### API
 
 @app.route('/api/teams/search')

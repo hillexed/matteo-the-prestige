@@ -2,7 +2,8 @@ import time, asyncio, json, jsonpickle, random, math, os
 import league_storage as league_db
 from itertools import chain
 from copy import deepcopy
-from games import team, game
+from games import game
+from teams import team
 from discord import Embed, Color
 
 data_dir = "data"
