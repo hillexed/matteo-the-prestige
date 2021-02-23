@@ -206,7 +206,7 @@ class StartRandomGameCommand(Command):
 
         channel = msg.channel
         await channel.send("Rolling the bones... This might take a while.")
-        teamslist = games.get_all_teams()
+        teamslist = teams.get_all_teams()
 
         game = games.game(random.choice(teamslist).finalize(), random.choice(teamslist).finalize())
 
@@ -300,7 +300,7 @@ class ShowAllTeamsCommand(Command):
     description = "Shows a paginated list of all teams available for games which can be scrolled through."
 
     async def execute(self, msg, command):
-        list_task = asyncio.create_task(team_pages(msg, games.get_all_teams()))
+        list_task = asyncio.create_task(team_pages(msg, teams.get_all_teams()))
         await list_task
 
 class SearchTeamsCommand(Command):
@@ -1357,6 +1357,13 @@ async def on_message(msg):
             await msg.channel.send("Can't find that command, boss; try checking the list with `m;help`.")
         except CommandError as ce:
             await msg.channel.send(str(ce))
+        except Exception as e:
+            await msg.add_reaction("⚠️")
+            await msg.add_reaction("🇨")
+            await msg.add_reaction("🇷")
+            await msg.add_reaction("🇦 ")
+            await msg.add_reaction("🇸")
+            await msg.add_reaction("🇭")
 
 
 async def setup_game(channel, owner, newgame):
