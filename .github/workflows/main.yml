@@ -3,7 +3,7 @@ on:
   types: [closed] 
 jobs:
   repo-sync:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true and github.repository == 'hillexed/matteo-the-prestige'
     runs-on: ubuntu-latest
     steps:
     - name: repo-sync
