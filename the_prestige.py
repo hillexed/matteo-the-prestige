@@ -35,13 +35,7 @@ class IntroduceCommand(Command):
         return user.id in config()["owners"]
 
     async def execute(self, msg, command):
-        text = """**Your name, favorite team, and pronouns**: Matteo Prestige, CHST, they/them ***only.*** There's more than one of us up here, after all.
-**What are you majoring in (wrong answers only)**: Economics.
-**Your favorite and least favorite beverage, without specifying which**: Vanilla milkshakes, chocolate milkshakes.
-**Favorite non-Mild Low team**: The Mills. We hope they're treating Ren alright.
-**If you were a current blaseball player, who would you be**: We refuse to answer this question.
-**Your hobbies/interests**: Minigolf, blaseball, felony insider trading.
-Our avatar was graciously provided to us, with permission, by @HetreaSky on Twitter.
+        text = """**Your name, favorite team, and pronouns**: Matteo Prestwoge, CHST, they/them.
 """
         await msg.channel.send(text)
 
@@ -92,7 +86,7 @@ class IdolizeCommand(Command):
                 await msg.channel.send(f"{player_name} is now {msg.author.display_name}'s idol.")
                 await msg.channel.send(f"Reply if {player_name} is your idol also.")
         except:
-            await msg.channel.send("Something went wrong. Tell xvi.")
+            await msg.channel.send("Something went wrong. Tell an admin.")
 
 class ShowIdolCommand(Command):
     name = "showidol"
@@ -240,7 +234,7 @@ class SetupGameCommand(Command):
             inningmax = int(command)
         except:
             inningmax = 3
-        game_task = asyncio.create_task(setup_game(msg.channel, msg.author, games.game(msg.author.name, games.team(), games.team(), length=inningmax)))
+        game_task = asyncio.create_task(setup_game(msg.channel, msg.author, games.game(msg.author.name, teams.team(), teams.team(), length=inningmax)))
         await game_task
         
 class SaveTeamCommand(Command):
@@ -341,7 +335,7 @@ class SwapPlayerCommand(Command):
         try:
             team_name = command.split("\n")[1].strip()
             player_name = command.split("\n")[2].strip()
-            team, owner_id = games.get_team_and_owner(team_name)
+            team, owner_id = teams.get_team_and_owner(team_name)
             if team is None:
                 await msg.channel.send("Can't find that team, boss. Typo?")
                 return
@@ -353,8 +347,8 @@ class SwapPlayerCommand(Command):
                 return
             else:
                 await msg.channel.send(embed=build_team_embed(team))
-                games.update_team(team)
-                await msg.channel.send("Paperwork signed, stamped, copied, and faxed up to the goddess. Xie's pretty quick with this stuff.")
+                teams.update_team(team)
+                await msg.channel.send("Paperwork signed, stamped, copied, and set on fire.")
         except IndexError:
             await msg.channel.send("Three lines, remember? Command, then team, then name.")
 
@@ -370,7 +364,7 @@ class MovePlayerCommand(Command):
         try:
             team_name = command.split("\n")[1].strip()
             player_name = command.split("\n")[2].strip()
-            team, owner_id = games.get_team_and_owner(team_name)
+            team, owner_id = teams.get_team_and_owner(team_name)
             try:
                 new_pos = int(command.split("\n")[3].strip())
             except ValueError:
@@ -393,8 +387,8 @@ class MovePlayerCommand(Command):
 
                 if (roster is not None and team.slide_player_spec(player_name, new_pos, roster)) or (roster is None and team.slide_player(player_name, new_pos)):
                     await msg.channel.send(embed=build_team_embed(team))
-                    games.update_team(team)
-                    await msg.channel.send("Paperwork signed, stamped, copied, and faxed up to the goddess. Xie's pretty quick with this stuff.")
+                    teams.update_team(team)
+                    await msg.channel.send("Paperwork signed, stamped, copied, and set on fire.")
                 else:
                     await msg.channel.send("You either gave us a number that was bigger than your current roster, or we couldn't find the player on the team. Try again.")
                     return
@@ -413,12 +407,12 @@ class AddPlayerCommand(Command):
         try:
             team_name = command.split("\n")[1].strip()
             player_name = command.split("\n")[2].strip()
-            team, owner_id = games.get_team_and_owner(team_name)
+            team, owner_id = teams.get_team_and_owner(team_name)
             if owner_id != msg.author.id and msg.author.id not in config()["owners"]:
                 await msg.channel.send("You're not authorized to mess with this team. Sorry, boss.")
                 return
 
-            new_player = games.player(ono.get_stats(player_name))
+            new_player = teams.player(ono.get_stats(player_name))
 
             if "batter" in command.split("\n")[0].lower():
                 if not team.add_lineup(new_player)[0]:
@@ -433,8 +427,8 @@ class AddPlayerCommand(Command):
                 return
 
             await msg.channel.send(embed=build_team_embed(team))
-            games.update_team(team)
-            await msg.channel.send("Paperwork signed, stamped, copied, and faxed up to the goddess. Xie's pretty quick with this stuff.")
+            teams.update_team(team)
+            await msg.channel.send("Paperwork signed, stamped, copied, and set on fire.")
         except IndexError:
             await msg.channel.send("Three lines, remember? Command, then team, then name.")
 
@@ -449,7 +443,7 @@ class RemovePlayerCommand(Command):
         try:
             team_name = command.split("\n")[1].strip()
             player_name = command.split("\n")[2].strip()
-            team, owner_id = games.get_team_and_owner(team_name)
+            team, owner_id = teams.get_team_and_owner(team_name)
             if owner_id != msg.author.id and msg.author.id not in config()["owners"]:
                 await msg.channel.send("You're not authorized to mess with this team. Sorry, boss.")
                 return
@@ -460,8 +454,8 @@ class RemovePlayerCommand(Command):
 
             else:
                 await msg.channel.send(embed=build_team_embed(team))
-                games.update_team(team)
-                await msg.channel.send("Paperwork signed, stamped, copied, and faxed up to the goddess. Xie's pretty quick with this stuff.")
+                teams.update_team(team)
+                await msg.channel.send("Paperwork signed, stamped, copied, and set on fire.")
         except IndexError:
             await msg.channel.send("Three lines, remember? Command, then team, then name.")
 
@@ -478,13 +472,13 @@ class ReplacePlayerCommand(Command):
             team_name = command.split("\n")[1].strip()
             remove_name = command.split("\n")[2].strip()
             add_name = command.split("\n")[3].strip()
-            team, owner_id = games.get_team_and_owner(team_name)
+            team, owner_id = teams.get_team_and_owner(team_name)
             if owner_id != msg.author.id and msg.author.id not in config()["owners"]:
                 await msg.channel.send("You're not authorized to mess with this team. Sorry, boss.")
                 return
 
             old_player, old_pos, old_list = team.find_player(remove_name)
-            new_player = games.player(ono.get_stats(add_name))
+            new_player = teams.player(ono.get_stats(add_name))
 
             if old_player is None:
                 await msg.channel.send("We've got bad news: that player isn't on your team. The good news is that... that player isn't on your team?")
@@ -500,8 +494,8 @@ class ReplacePlayerCommand(Command):
                     team.add_pitcher(new_player)
                     team.slide_player(add_name, old_pos+1)
                 await msg.channel.send(embed=build_team_embed(team))
-                games.update_team(team)
-                await msg.channel.send("Paperwork signed, stamped, copied, and faxed up to the goddess. Xie's pretty quick with this stuff.")
+                teams.update_team(team)
+                await msg.channel.send("Paperwork signed, stamped, copied, and set on fire.")
         except IndexError:
             await msg.channel.send("Four lines, remember? Command, then team, then the two names.")
 
@@ -528,13 +522,13 @@ class HelpCommand(Command):
 class DeleteTeamCommand(Command):
     name = "deleteteam"
     template = "m;deleteteam [name]"
-    description = "Allows you to delete the team with the provided name. You'll get an embed with a confirmation to prevent accidental deletions. Hit the 👍 and your team will be deleted.. Requires team ownership. If you are the owner and the bot is telling you it's not yours, contact xvi and xie can assist."
+    description = "Allows you to delete the team with the provided name. You'll get an embed with a confirmation to prevent accidental deletions. Hit the 👍 and your team will be deleted.. Requires team ownership."
 
     async def execute(self, msg, command):
         team_name = command.strip()
-        team, owner_id = games.get_team_and_owner(team_name)
+        team, owner_id = teams.get_team_and_owner(team_name)
         if owner_id != msg.author.id and msg.author.id not in config()["owners"]: #returns if person is not owner and not bot mod
-            await msg.channel.send("That team ain't yours, chief. If you think that's not right, bug xvi about deleting it for you.")
+            await msg.channel.send("That team ain't yours, chief. If you think that's not right, bug an admin about deleting it for you.")
             return
         elif team is not None:
             delete_task = asyncio.create_task(team_delete_confirm(msg.channel, team, msg.author))
@@ -689,7 +683,7 @@ class StartDraftCommand(Command):
                 await msg.channel.send(f"I don't recognize {handle_token}")
                 return
             team_name = content[i + 1].strip()
-            if games.get_team(team_name):
+            if teams.get_team(team_name):
                 await msg.channel.send(f'Sorry {handle}, {team_name} already exists')
                 return
             slogan = content[i + 2].strip()
@@ -1169,7 +1163,7 @@ class LeagueSwapTeamCommand(Command):
                 league.generate_schedule()
                 leagues.save_league_as_new(league)
                 await msg.channel.send(embed=league.standings_embed())
-                await msg.channel.send("Paperwork signed, stamped, copied, and faxed up to the goddess. Xie's pretty quick with this stuff.")
+                await msg.channel.send("Paperwork signed, stamped, copied, and set on fire.")
             else:
                 await msg.channel.send("That league isn't yours, chief.")
         else:
@@ -1227,7 +1221,7 @@ class LeagueRenameCommand(Command):
                     return
                 leagues.save_league_as_new(league)
                 await msg.channel.send(embed=league.standings_embed())
-                await msg.channel.send("Paperwork signed, stamped, copied, and faxed up to the goddess. Xie's pretty quick with this stuff.")
+                await msg.channel.send("Paperwork signed, stamped, copied, and set on fire.")
             else:
                 await msg.channel.send("That league isn't yours, chief.")
         else:
@@ -1329,11 +1323,11 @@ async def on_reaction_add(reaction, user):
         game = setupmessages[reaction.message]
         try:
             if str(reaction.emoji) == "🔼" and not user == client.user:
-                new_player = games.player(ono.get_stats(db.get_user_player(user)["name"]))
+                new_player = teams.player(ono.get_stats(db.get_user_player(user)["name"]))
                 game.teams["away"].add_lineup(new_player)
                 await reaction.message.channel.send(f"{new_player} {new_player.star_string('batting_stars')} takes spot #{len(game.teams['away'].lineup)} on the away lineup.")
             elif str(reaction.emoji) == "🔽" and not user == client.user:
-                new_player = games.player(ono.get_stats(db.get_user_player(user)["name"]))
+                new_player = teams.player(ono.get_stats(db.get_user_player(user)["name"]))
                 game.teams["home"].add_lineup(new_player)
                 await reaction.message.channel.send(f"{new_player} {new_player.star_string('batting_stars')} takes spot #{len(game.teams['home'].lineup)} on the home lineup.")
         except:
@@ -1388,7 +1382,7 @@ async def setup_game(channel, owner, newgame):
                 if len(new_pitcher_name) > 70:
                     await channel.send("That player name is too long, chief. 70 or less.")
                 else:
-                    new_pitcher = games.player(ono.get_stats(new_pitcher_name))
+                    new_pitcher = teams.player(ono.get_stats(new_pitcher_name))
                     newgame.teams["away"].set_pitcher(new_pitcher)
                     await channel.send(f"{new_pitcher} {new_pitcher.star_string('pitching_stars')}, pitching for the away team!\nNow, the home team's pitcher. Same dance, folks.")
             except NameError:
@@ -1400,7 +1394,7 @@ async def setup_game(channel, owner, newgame):
             if len(new_pitcher_name) > 70:
                 await channel.send("That player name is too long, chief. 70 or less.")
             else:
-                new_pitcher = games.player(ono.get_stats(new_pitcher_name))
+                new_pitcher = teams.player(ono.get_stats(new_pitcher_name))
                 newgame.teams["home"].set_pitcher(new_pitcher)
                 await channel.send(f"And {new_pitcher} {new_pitcher.star_string('pitching_stars')}, pitching for the home team.")
         except:
@@ -1453,7 +1447,7 @@ Creator, type `{newgame.name} done` to finalize lineups.""")
                 if len(new_player_name) > 70:
                     await channel.send("That player name is too long, chief. 70 or less.")
                 else:
-                    new_player = games.player(ono.get_stats(new_player_name))
+                    new_player = teams.player(ono.get_stats(new_player_name))
         try:
             if new_player is not None:
                 newgame.teams[side].add_lineup(new_player)
@@ -1591,8 +1585,8 @@ async def start_tournament_round(channel, tourney, seeding = None):
 
 async def continue_tournament_series(tourney, queue, games_list, wins_in_series):
     for oldgame in queue:
-        away_team = games.get_team(oldgame.teams["away"].name)
-        home_team = games.get_team(oldgame.teams["home"].name)
+        away_team = teams.get_team(oldgame.teams["away"].name)
+        home_team = teams.get_team(oldgame.teams["home"].name)
 
         if tourney.league is not None:
             if tourney.day is None:
@@ -1763,7 +1757,7 @@ async def team_delete_confirm(channel, team, owner):
                 await channel.send("Job's done. We'll clean up on our way out, don't worry.")
             else:
                 await asyncio.sleep(2)
-                await channel.send("Huh. Didn't quite work. Tell xvi next time you see xer.")
+                await channel.send("Huh. Didn't quite work. Tell an admin.")
             return
         elif react.emoji == "👎":
             await channel.send("Message received. Pumping brakes, turning this car around.")
@@ -1829,18 +1823,18 @@ def team_from_collection(newteam_json):
             raise CommandError(f"{player['name']} is too long, chief. 70 or less.")
 
     #actually build the team
-    newteam = games.team()
+    newteam = teams.team()
     newteam.name = newteam_json["fullName"]
     newteam.slogan = newteam_json["slogan"]
     for player in newteam_json["lineup"]:
-        newteam.add_lineup(games.player(json.dumps(player)))
+        newteam.add_lineup(teams.player(json.dumps(player)))
     for player in newteam_json["rotation"]:
-        newteam.add_pitcher(games.player(json.dumps(player)))
+        newteam.add_pitcher(teams.player(json.dumps(player)))
 
     return newteam
 
 def team_from_message(command):
-    newteam = games.team()
+    newteam = teams.team()
     roster = command.split("\n",1)[1].split("\n")
     newteam.name = roster[0].strip() #first line is team name
     newteam.slogan = roster[1].strip() #second line is slogan
@@ -1851,7 +1845,7 @@ def team_from_message(command):
         if roster[rosternum] != "":
             if len(roster[rosternum]) > 70:
                 raise CommandError(f"{roster[rosternum]} is too long, chief. 70 or less.")
-            newteam.add_lineup(games.player(ono.get_stats(roster[rosternum].rstrip())))
+            newteam.add_lineup(teams.player(ono.get_stats(roster[rosternum].rstrip())))
         else:
             pitchernum = rosternum + 1 
             break
@@ -1859,7 +1853,7 @@ def team_from_message(command):
     for rosternum in range(pitchernum, len(roster)):
         if len(roster[rosternum]) > 70:
             raise CommandError(f"{roster[len(roster)-1]} is too long, chief. 70 or less.")
-        newteam.add_pitcher(games.player(ono.get_stats(roster[rosternum].rstrip()))) 
+        newteam.add_pitcher(teams.player(ono.get_stats(roster[rosternum].rstrip()))) 
 
     if len(newteam.name) > 30:
         raise CommandError("Team names have to be less than 30 characters! Try again.")

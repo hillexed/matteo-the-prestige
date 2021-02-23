@@ -34,20 +34,12 @@ function Header() {
           <Link to="/create_league">Create a League</Link>
         </div>
         <div id="link_div">
-          <a href="https://www.patreon.com/sixteen" className="patreon_link" target="_blank" rel="noopener noreferrer">
-            <div className="patreon_container">
-              <img className="patreon_logo" src={patreonLogo} alt="Patreon"/>
-            </div>
-          </a>
-          <a href="https://github.com/Sakimori/matteo-the-prestige" className="github_link" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/hillexed/matteo-the-prestige" className="github_link" target="_blank" rel="noopener noreferrer">
             <img className="github_logo" src={githubLogo} alt="Github"/>
-          </a>
-          <a href="https://twitter.com/intent/follow?screen_name=SIBR_XVI" className="twitter_link" target="_blank" rel="noopener noreferrer">
-            <img className="twitter_logo" src={twitterLogo} alt="Twitter"/>
           </a>
         </div>
       </div>
-      <a href="/" className="page_header"><h2 className="page_header" style={{fontSize:"50px"} as React.CSSProperties}>THE SIMMADOME</h2></a>
+      <a href="/" className="page_header"><h2 className="page_header" style={{fontSize:"50px"} as React.CSSProperties}>THE TWINNADOME</h2></a>
       <h2 className="page_header">Join SIBR on <a href="https://discord.gg/UhAajY2NCW" className="link"><img src={discordlogo} alt="" height="30"/></a> to start your own games!</h2>
     </div>
   );

@@ -1,1 +1,1 @@
-python the_prestige.py
+python3 the_prestige.py
